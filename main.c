@@ -14,6 +14,15 @@ typedef enum {
     TILE_SPAWN
 } TileType;
 
+typedef struct {
+    int x, y;
+    int pathIndex;
+    int active;
+} Enemy;
+
+#define MAX_ENEMIES 10
+Enemy enemies[MAX_ENEMIES];
+
 TileType map[MAP_WIDTH][MAP_HEIGHT];
 
 void GenerateMap() {
@@ -48,6 +57,18 @@ void DrawMap() {
 
             DrawRectangle(x * CHUNK_SIZE, y * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, color);
             DrawRectangleLines(x * CHUNK_SIZE, y * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, BLACK);
+        }
+    }
+}
+
+void SpawnEnemy() {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].active) {
+            enemies[i].x = 0;
+            enemies[i].y = 0;
+            enemies[i].pathIndex = 0;
+            enemies[i].active = 1;
+            break;
         }
     }
 }
