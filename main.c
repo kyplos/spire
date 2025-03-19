@@ -23,6 +23,7 @@ typedef struct {
 #define ENEMY_SPEED 2
 #define MAX_ENEMIES 10
 #define SPAWN_INTERVAL 30
+#define ENEMY_SPACING 4
 Enemy enemies[MAX_ENEMIES];
 int spawnTimer = 0;
 
@@ -94,6 +95,18 @@ void UpdateEnemies() {
 
             enemies[i].x = newX;
             enemies[i].y = newY;
+
+            int canMove = 1;
+            for (int j = 0; j < MAX_ENEMIES; j++) {
+                if (i != j && enemies[j].active) {
+                    int distX = abs(enemies[j].x - newX);
+                    int distY = abs(enemies[j].y - newY);
+                    if (distX < ENEMY_SPACING && distY < ENEMY_SPACING) {
+                        canMove = 0;
+                        break;
+                    }
+                }
+            }
         }
     }
 }
