@@ -20,8 +20,11 @@ typedef struct {
     int active;
 } Enemy;
 
+#define ENEMY_SPEED 2
 #define MAX_ENEMIES 10
+#define SPAWN_INTERVAL 30
 Enemy enemies[MAX_ENEMIES];
+int spawnTimer = 0;
 
 TileType map[MAP_WIDTH][MAP_HEIGHT];
 
@@ -73,16 +76,59 @@ void SpawnEnemy() {
     }
 }
 
+void UpdateEnemies() {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (enemies[i].active) {
+            int x = enemies[i].x / CHUNK_SIZE;
+            int y = enemies[i].y / CHUNK_SIZE;
+
+            if (map[x][y] == TILE_CASTLE) {
+                enemies[i].active = 0;
+                continue;
+            }
+
+            int newX = enemies[i].x;
+            int newY = enemies[i].y;
+            if (x < 31) newX += ENEMY_SPEED;
+            else if (y < 31) newY += ENEMY_SPEED;
+
+            enemies[i].x = newX;
+            enemies[i].y = newY;
+        }
+    }
+}
+
+void DrawEnemies() {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (enemies[i].active) {
+            DrawCircle(enemies[i].x + CHUNK_SIZE / 2, enemies[i].y + CHUNK_SIZE / 2, CHUNK_SIZE / 3, BLACK);
+        }
+    }
+}
+
 int main() {
     InitWindow(1024, 1024, "Spire");
     SetTargetFPS(60);
 
     GenerateMap();
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+            enemies[i].active = 0;
+    }
 
     while (!WindowShouldClose()) {
+        spawnTimer++;
+        if (spawnTimer >= SPAWN_INTERVAL) {
+            SpawnEnemy();
+            spawnTimer = 0;
+        }
+        UpdateEnemies();
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawMap();
+        DrawEnemies();
         EndDrawing();
     }
+    CloseWindow();
+    return 0;
 }
